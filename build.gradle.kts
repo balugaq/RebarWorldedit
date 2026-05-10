@@ -21,8 +21,14 @@ group = project.properties["group"]!!
 // Add repositories from which to download dependencies
 repositories {
     mavenCentral()
+    maven("https://central.sonatype.com/repository/maven-snapshots/") {
+        name = "sonatype"
+    }
     maven("https://repo.papermc.io/repository/maven-public/") {
         name = "papermc"
+    }
+    maven("https://repo.metamechanists.org/releases") {
+        name = "MetaMechanists Repository"
     }
     maven("https://jitpack.io") {
         name = "JitPack"
@@ -36,9 +42,11 @@ val pylonVersion = project.properties["pylon.version"] as String
 
 // Download dependencies
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("io.github.pylonmc:rebar:$rebarVersion")
     compileOnly("io.github.pylonmc:pylon:$pylonVersion")
+    implementation("org.metamechanists:DisplayModelLib:35")
+    shadow("org.metamechanists:DisplayModelLib:35")
 }
 
 // Settings for IntelliJ
@@ -65,8 +73,9 @@ bukkit {
     main = project.properties["main-class"] as String
     version = project.version.toString()
     apiVersion = "1.21"
-    depend = listOf("Rebar", "Pylon")
+    depend = listOf("Rebar")
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    website = "https://github.com/balugaq/RebarWorldedit"
 }
 
 // Run a server using the run server gradle plugin
