@@ -1,24 +1,16 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
-// Specify what gradle plugins to use
 plugins {
     java
-    // IntelliJ plugin
     idea
-    // used to package needed dependencies into the jar
-    id("com.gradleup.shadow") version "9.2.2"
-    // used to generate plugin.yml
+    id("com.gradleup.shadow") version "8.3.2"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
-    // used to run a test server locally
     id("xyz.jpenilla.run-paper") version "2.3.0"
-    // lombok (provides useful annotations)
     id("io.freefair.lombok") version "8.13.1"
 }
 
-// Specify the 'group' (eg: io.github.pylonmc.exampleaddon)
 group = project.properties["group"]!!
 
-// Add repositories from which to download dependencies
 repositories {
     mavenCentral()
     maven("https://central.sonatype.com/repository/maven-snapshots/") {
@@ -64,7 +56,12 @@ java {
 
 // Configuration for the output JAR
 tasks.shadowJar {
-    archiveClassifier = ""
+    relocate("org.metamechanists", "${project.group}.shaded.org.metamechanists")
+
+    mergeServiceFiles()
+
+    archiveBaseName = project.name
+    archiveClassifier = null
 }
 
 // Generate the plugin.yml file using the bukkit gradle plugin
@@ -80,23 +77,14 @@ bukkit {
 
 // Run a server using the run server gradle plugin
 tasks.runServer {
-    doFirst {
-        // Remove the plugins folder. This is so any changes to language files etc are propagated.
-        val runFolder = project.projectDir.resolve("run")
-        val pluginsDir = runFolder.resolve("plugins")
-        pluginsDir.deleteRecursively()
-    }
-
     // Download pylon core and add it to the plugins folder
     downloadPlugins {
         github("pylonmc", "rebar", rebarVersion, "rebar-$rebarVersion.jar")
     }
+    maxHeapSize = "4G"
+    minecraftVersion("1.21.10")
+}
 
-    // Download pylon base and add it to the plugins folder
-    downloadPlugins {
-        github("pylonmc", "pylon", pylonVersion, "pylon-$pylonVersion.jar")
-    }
-
-    maxHeapSize = "2G"
-    minecraftVersion("1.21.11")
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
