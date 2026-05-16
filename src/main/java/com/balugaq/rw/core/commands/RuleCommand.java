@@ -46,20 +46,21 @@ public class RuleCommand {
                               .suggests((ctx, builder) ->
                                   builder.suggest("worldedit.modification-block-limit").buildFuture()
                               )
-                              .then(Commands.argument("value", IntegerArgumentType.integer(0)))
-                              .executes(ctx -> {
-                                  execute(ctx, "worldedit.modification-block-limit", IntegerArgumentType.getInteger(ctx, "value"));
-                                  return SINGLE_SUCCESS;
-                              }))
+                              .then(Commands.argument("value", IntegerArgumentType.integer(0))
+                                  .executes(ctx -> {
+                                      execute(ctx, "worldedit.modification-block-limit", IntegerArgumentType.getInteger(ctx, "value"));
+                                      return SINGLE_SUCCESS;
+                                  })))
+
                 .then(Commands.argument("rule", StringArgumentType.word())
                               .suggests((ctx, builder) ->
                                   builder.suggest("worldedit.modification-chunk-limit-per-second").buildFuture()
                               )
-                              .then(Commands.argument("value", IntegerArgumentType.integer(0)))
-                              .executes(ctx -> {
-                                  execute(ctx, "worldedit.modification-chunk-limit-per-second", IntegerArgumentType.getInteger(ctx, "value"));
-                                  return SINGLE_SUCCESS;
-                              }));
+                              .then(Commands.argument("value", IntegerArgumentType.integer(0))
+                                  .executes(ctx -> {
+                                      execute(ctx, "worldedit.modification-chunk-limit-per-second", IntegerArgumentType.getInteger(ctx, "value"));
+                                      return SINGLE_SUCCESS;
+                                  })));
 
     }
 

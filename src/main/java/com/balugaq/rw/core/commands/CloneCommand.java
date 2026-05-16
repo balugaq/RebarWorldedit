@@ -3,11 +3,9 @@ package com.balugaq.rw.core.commands;
 import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.api.RWBlockBreakContext;
 import com.balugaq.rw.implementation.RebarWorldedit;
-import com.balugaq.rw.utils.CommandUtil;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.pylonmc.rebar.block.BlockStorage;
@@ -18,17 +16,10 @@ import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -66,7 +57,7 @@ public class CloneCommand {
             return;
         }
 
-        plugin.send(player, "command.clone.start", "pos1", WorldUtils.locationToString(pos1), "pos2", WorldUtils.locationToString(pos2));
+        plugin.send(player, "command.clone.start", "pos1", WorldUtils.fineLocStr(pos1), "pos2", WorldUtils.fineLocStr(pos2));
         final long currentMillSeconds = System.currentTimeMillis();
 
         final AtomicInteger count = new AtomicInteger();

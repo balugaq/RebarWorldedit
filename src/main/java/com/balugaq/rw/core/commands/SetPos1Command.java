@@ -8,14 +8,10 @@ import com.mojang.brigadier.context.CommandContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
@@ -36,9 +32,9 @@ public class SetPos1Command {
         final Location pos1 = plugin.getCommandManager().getPos1(player.getUniqueId());
         final Location pos2 = plugin.getCommandManager().getPos2(player.getUniqueId());
         if (pos2 != null) {
-            plugin.send(player, "command.setpos1.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
+            plugin.send(player, "command.setpos1.success-with-range", "pos", WorldUtils.fineLocStr(pos1), "range", WorldUtils.locationRange(pos1, pos2));
         } else {
-            plugin.send(player, "command.setpos1.success", "pos", WorldUtils.locationToString(pos1));
+            plugin.send(player, "command.setpos1.success", "pos", WorldUtils.fineLocStr(pos1));
         }
     }
 

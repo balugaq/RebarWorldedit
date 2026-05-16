@@ -18,7 +18,6 @@ public class RebarWorldeditCommand {
     private final ConfirmCommand confirmCommand = new ConfirmCommand(instance);
     private final HelpCommand helpCommand = new HelpCommand(instance);
     private final PasteCommand pasteCommand = new PasteCommand(instance);
-    private final ReloadCommand reloadCommand = new ReloadCommand(instance);
     private final RuleCommand ruleCommand = new RuleCommand(instance);
     private final SetPos1Command setPosCommand = new SetPos1Command(instance);
     private final SetPos2Command setPos2Command = new SetPos2Command(instance);
@@ -31,7 +30,6 @@ public class RebarWorldeditCommand {
             .then(confirmCommand.get())
             .then(helpCommand.get())
             .then(pasteCommand.get())
-            .then(reloadCommand.get())
             .then(ruleCommand.get())
             .then(setPosCommand.get())
             .then(setPos2Command.get())

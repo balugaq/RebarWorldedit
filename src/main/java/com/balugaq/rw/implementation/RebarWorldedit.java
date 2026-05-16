@@ -165,8 +165,7 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
     @Override
     public @NotNull Set<Locale> getLanguages() {
         return Set.of(
-                Locale.of("en"),
-                Locale.of("zh")
+                Locale.of("en")
         );
     }
 

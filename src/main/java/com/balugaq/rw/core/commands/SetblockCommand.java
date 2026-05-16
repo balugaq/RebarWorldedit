@@ -1,7 +1,6 @@
 package com.balugaq.rw.core.commands;
 
 import com.balugaq.rw.api.IRebarWorldedit;
-import com.balugaq.rw.api.RWBlockBreakContext;
 import com.balugaq.rw.api.RWBlockCreateContext;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
@@ -17,7 +16,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.math.BlockPosition;
-import io.papermc.paper.math.FinePosition;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -26,7 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -77,7 +74,7 @@ public class SetblockCommand {
             return;
         }
 
-        plugin.send(player, "command.setblock.start", "block", WorldUtils.locationToString(pos));
+        plugin.send(player, "command.setblock.start", "block", WorldUtils.fineLocStr(pos));
 
         final long currentMillSeconds = System.currentTimeMillis();
 
@@ -106,20 +103,6 @@ public class SetblockCommand {
                     execute(ctx, null, null, false);
                     return SINGLE_SUCCESS;
                 })
-                .then(Commands.argument("blockId", new RegistryCommandArgument<>(RebarRegistry.BLOCKS))
-                    .executes(ctx -> {
-                        execute(
-                              ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), false
-                        );
-                        return SINGLE_SUCCESS;
-                    })
-                        .then(Commands.argument("withoutblock", BoolArgumentType.bool()))
-                        .executes(ctx -> {
-                            execute(
-                                  ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "withoutblock")
-                            );
-                            return SINGLE_SUCCESS;
-                        }))
                 .then(Commands.argument("pos", ArgumentTypes.blockPosition())
                       .executes(ctx -> {
                           execute(
@@ -128,18 +111,18 @@ public class SetblockCommand {
                           return SINGLE_SUCCESS;
                       })
                       .then(Commands.argument("blockId", new RegistryCommandArgument<>(RebarRegistry.BLOCKS))
-                            .executes(ctx -> {
-                                execute(
-                                        ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), false
-                                );
-                                return SINGLE_SUCCESS;
-                            })
-                            .then(Commands.argument("withoutblock", BoolArgumentType.bool()))
-                            .executes(ctx -> {
-                                execute(
-                                        ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "withoutblock")
-                                );
-                                return SINGLE_SUCCESS;
-                            })));
+                          .then(Commands.argument("withoutblock", BoolArgumentType.bool())
+                              .executes(ctx -> {
+                                  execute(
+                                          ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "withoutblock")
+                                  );
+                                  return SINGLE_SUCCESS;
+                              }))))
+                          .executes(ctx -> {
+                              execute(
+                                      ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), false
+                              );
+                              return SINGLE_SUCCESS;
+                          });
     }
 }

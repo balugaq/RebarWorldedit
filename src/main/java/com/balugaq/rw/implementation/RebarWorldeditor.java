@@ -33,9 +33,9 @@ public class RebarWorldeditor extends RebarItem implements RebarBlockInteractor 
             final Location pos1 = RebarWorldedit.getInstance().getCommandManager().getPos1(player.getUniqueId());
             final Location pos2 = RebarWorldedit.getInstance().getCommandManager().getPos2(player.getUniqueId());
             if (pos2 != null) {
-                RebarWorldedit.getInstance().send(player, "command.setpos1.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos1.success-with-range", "pos", WorldUtils.fineLocStr(pos1), "range", WorldUtils.locationRange(pos1, pos2));
             } else {
-                RebarWorldedit.getInstance().send(player, "command.setpos1.success", "pos", WorldUtils.locationToString(pos1));
+                RebarWorldedit.getInstance().send(player, "command.setpos1.success", "pos", WorldUtils.fineLocStr(pos1));
             }
         }
 
@@ -44,9 +44,9 @@ public class RebarWorldeditor extends RebarItem implements RebarBlockInteractor 
             final Location pos1 = RebarWorldedit.getInstance().getCommandManager().getPos1(player.getUniqueId());
             final Location pos2 = RebarWorldedit.getInstance().getCommandManager().getPos2(player.getUniqueId());
             if (pos1 != null) {
-                RebarWorldedit.getInstance().send(player, "command.setpos2.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos2.success-with-range", "pos", WorldUtils.fineLocStr(pos1), "range", WorldUtils.locationRange(pos1, pos2));
             } else {
-                RebarWorldedit.getInstance().send(player, "command.setpos2.success", "pos", WorldUtils.locationToString(pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos2.success", "pos", WorldUtils.fineLocStr(pos2));
             }
         }
 

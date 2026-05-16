@@ -41,7 +41,7 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
 
     default Component arguments(@Nullable Locale locale, @NotNull String translationKey, @Nullable Object @NotNull ... args) {
         List<RebarArgument> pargs = new ArrayList<>();
-        for (int i = 0; i <= args.length / 2; i += 2) {
+        for (int i = 0; i < args.length / 2; i += 1) {
             if (args[i] == null || args[i + 1] == null) {
                 continue;
             }
@@ -71,7 +71,7 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
     String MESSAGE_PREFIX = "rebarworldedit.messages.";
 
     default void send(CommandSender sender, String translationKey, Object... args) {
-        sender.sendMessage(arguments(Locale.ROOT, MESSAGE_PREFIX + translationKey, args));
+        sender.sendMessage(arguments(Locale.of("en"), MESSAGE_PREFIX + translationKey, args));
     }
 
     default void send(CommandSender sender, Locale locale, String translationKey, Object... args) {
@@ -87,20 +87,20 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
     }
 
     default void info(@NotNull String key) {
-        log(0xFFFFFF , "[INFO]", key);
+        log(0xFFFFFF , "[RebarWorldedit] [INFO] ", key);
     }
 
     default void warning(@NotNull String key) {
-        log(0xFFFF55, "[WARNING]", key);
+        log(0xFFFF55, "[RebarWorldedit] [WARNING] ", key);
     }
 
     default void severe(@NotNull String key) {
-        log(0xFF5555, "[SEVERE]", key);
+        log(0xFF5555, "[RebarWorldedit] [SEVERE] ", key);
     }
 
     default void debug(@NotNull String message) {
         if (getConfigManager().isDebug()) {
-            logDebug(0x55FFFF, "[DEBUG]", message);
+            logDebug(0x55FFFF, "[RebarWorldedit] [DEBUG] ", message);
         }
     }
 

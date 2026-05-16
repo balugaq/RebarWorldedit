@@ -32,9 +32,9 @@ public class SetPos2Command {
         final Location pos1 = plugin.getCommandManager().getPos1(player.getUniqueId());
         final Location pos2 = plugin.getCommandManager().getPos2(player.getUniqueId());
         if (pos2 != null) {
-            plugin.send(player, "command.setpos2.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
+            plugin.send(player, "command.setpos2.success-with-range", "pos", WorldUtils.fineLocStr(pos1), "range", WorldUtils.locationRange(pos1, pos2));
         } else {
-            plugin.send(player, "command.setpos2.success", "pos", WorldUtils.locationToString(pos1));
+            plugin.send(player, "command.setpos2.success", "pos", WorldUtils.fineLocStr(pos1));
         }
     }
 

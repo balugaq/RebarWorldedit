@@ -68,11 +68,11 @@ messages:
         confirm:
           - "<aqua>/rw confirm <gray>- <yellow>Confirm the last load"
     setpos1:
-      success: "<green>The first position has been marked as %pos%."
-      success-with-range: "<green>The first position has been marked as %pos%, with a total of <yellow>%range% <green>blocks."
+      success: "<green>The first position is marked at %pos%."
+      success-with-range: "<green>The first position is marked as %pos%, with a total of <yellow>%range% <green>blocks."
     setpos2:
-      success: "<green>The second position has been marked as %pos%."
-      success-with-range: "<green>The second position has been marked as %pos%, with a total of <yellow>%range% <green>blocks."
+      success: "<green>The second position is marked at %pos%."
+      success-with-range: "<green>The second position is marked as %pos%, with a total of <yellow>%range% <green>blocks."
     paste:
       start: "<green>Pasting %block% into the range of <yellow>%pos1% <green>~ <yellow>%pos2%."
       success: "<green>Pasted <yellow>%blocks% <green>%block%. Time elapsed: <yellow>%time% <green>ms."
@@ -107,6 +107,7 @@ messages:
     too-many-blocks: "&cToo many blocks in the specified area (maximum is %max%, but currently is %current%)"
     invalid-rule: "&cInvalid rule."
     no-request: "&cYou have not made any requests."
+    missing-argument: "&cMissing argument <%argument%>"
 
 guide:
   page:
@@ -114,7 +115,7 @@ guide:
 
 item:
   worldeditor:
-    name: "<green>Rebar WorldEditor"
-    lore:
-      - "<green>Left click <gray>- <yellow>Set the first position"
-      - "<green>Right click <gray>- <yellow>Set the second position"
+    name: <green>Rebar WorldEditor
+    lore: |-
+      <green>Left click <gray>- <yellow>Set the first position
+      <green>Right click <gray>- <yellow>Set the second position

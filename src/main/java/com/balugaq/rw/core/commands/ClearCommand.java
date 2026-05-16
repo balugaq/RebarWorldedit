@@ -2,11 +2,8 @@ package com.balugaq.rw.core.commands;
 
 import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.api.RWBlockBreakContext;
-import com.balugaq.rw.utils.CommandUtil;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -20,9 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -75,7 +69,7 @@ public class ClearCommand {
             return;
         }
 
-        plugin.send(player, "command.clear.start", WorldUtils.locationToString(pos1), WorldUtils.locationToString(pos2));
+        plugin.send(player, "command.clear.start", "pos1", WorldUtils.fineLocStr(pos1), "pos2", WorldUtils.fineLocStr(pos2));
 
         final long currentMillSeconds = System.currentTimeMillis();
         final AtomicInteger count = new AtomicInteger();
@@ -94,7 +88,7 @@ public class ClearCommand {
                         count.addAndGet(1);
                     }
                 }), () -> {
-                    plugin.send(player, "command.clear.success", count.get(), System.currentTimeMillis() - currentMillSeconds);
+                    plugin.send(player, "command.clear.success", "blocks", count.get(), "time", System.currentTimeMillis() - currentMillSeconds);
                 }
         );
     }

@@ -85,8 +85,8 @@ public class WorldUtils {
     }
 
     @NotNull
-    public static String locationToString(@NotNull Location l) {
-        return l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
+    public static String fineLocStr(@NotNull Location l) {
+        return l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
     }
 
     public static long locationRange(@NotNull Location pos1, @NotNull Location pos2) {
