@@ -7,9 +7,13 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public record RWBlockCreateContext(@NotNull Block block) implements BlockCreateContext {
+public record RWBlockCreateContext(@NotNull Block block, boolean shouldSetType) implements BlockCreateContext {
+    public static RWBlockCreateContext create(@NotNull Block block, boolean shouldSetType) {
+        return new RWBlockCreateContext(block, shouldSetType);
+    }
+
     public static RWBlockCreateContext create(@NotNull Block block) {
-        return new RWBlockCreateContext(block);
+        return new RWBlockCreateContext(block, true);
     }
 
     @Override
@@ -30,5 +34,10 @@ public record RWBlockCreateContext(@NotNull Block block) implements BlockCreateC
     @Override
     public @NotNull Block getBlock() {
         return block;
+    }
+
+    @Override
+    public boolean shouldSetType() {
+        return shouldSetType;
     }
 }

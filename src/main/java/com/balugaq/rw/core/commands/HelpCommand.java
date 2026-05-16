@@ -1,73 +1,74 @@
 package com.balugaq.rw.core.commands;
 
-import com.balugaq.rw.api.IRebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
+import com.balugaq.rw.implementation.RebarWorldedit;
 import com.balugaq.rw.utils.PermissionUtil;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HelpCommand extends SubCommand {
-    private static final String KEY = "help";
-    @NotNull
-    private final IRebarWorldEdit plugin;
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
-    public HelpCommand(@NotNull IRebarWorldEdit plugin) {
+public class HelpCommand {
+    public static final String KEY = "help";
+    @NotNull
+    private final IRebarWorldedit plugin;
+
+    public HelpCommand(@NotNull IRebarWorldedit plugin) {
         this.plugin = plugin;
     }
 
-    @Override
+
     @NotNull
     public String getKey() {
         return KEY;
     }
 
-    @Override
+
     @ParametersAreNonnullByDefault
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!PermissionUtil.hasPermission(commandSender, this)) {
-            plugin.send(commandSender, "error.no-permission");
-            return false;
+    public void execute(CommandContext<CommandSourceStack> ctx, @Nullable String subcommand) {
+        CommandSender sender = ctx.getSource().getSender();
+        if (subcommand == null) {
+            plugin.send(sender, "command.help.content");
+            return;
         }
 
-        if (args.length == 0) {
-            plugin.sendList(commandSender, "messages.command.help.content");
-            return true;
-        }
-
-        final String subCommand = args[0];
-        final AtomicBoolean found = new AtomicBoolean(false);
-        plugin.getCommandManager().iter(cmd -> {
-            if (cmd.getKey().equals(subCommand)) {
-                plugin.sendList(commandSender, "messages.command.help.usage." + cmd.getKey());
-                found.set(true);
-            }
-        });
-
-        if (!found.get()) {
-            plugin.send(commandSender, "error.unknown-subcommand", subCommand);
-        }
-
-        return true;
+        plugin.send(sender, "error.unknown-subcommand", subcommand);
     }
 
-    @Override
-    @NotNull
-    @ParametersAreNonnullByDefault
-    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!PermissionUtil.hasPermission(commandSender, this)) {
-            return new ArrayList<>();
-        }
 
-        if (args.length <= 1) {
-            final List<String> result = new ArrayList<>();
-            plugin.getCommandManager().iter(cmd -> result.add(cmd.getKey()));
-            return result;
-        }
-        return new ArrayList<>();
+    public @NotNull LiteralArgumentBuilder<CommandSourceStack> get() {
+        return Commands.literal(getKey())
+                .requires(source -> PermissionUtil.hasPermission(source.getSender(), getKey()) && source.getSender() instanceof Player)
+                .executes(ctx -> {
+                    execute(ctx, null);
+                    return SINGLE_SUCCESS;
+                })
+                .then(Commands.argument("subcommand", StringArgumentType.word())
+                              .suggests((ctx, builder) -> {
+                                  for (String subcommand : RebarWorldedit.getInstance().getCommandManager().getSubCommands()) {
+                                      builder.suggest(subcommand);
+                                  }
+                                  return builder.buildFuture();
+                              })
+                              .executes(ctx -> {
+                                  execute(
+                                          ctx,
+                                          StringArgumentType.getString(ctx, "subcommand")
+                                  );
+                                  return SINGLE_SUCCESS;
+                              }));
     }
 }

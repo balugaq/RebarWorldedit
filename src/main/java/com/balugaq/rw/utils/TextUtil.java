@@ -1,6 +1,6 @@
 package com.balugaq.rw.utils;
 
-import com.balugaq.rw.implementation.RebarWorldEdit;
+import com.balugaq.rw.implementation.RebarWorldedit;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Color;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +69,7 @@ public class TextUtil {
     public static String colorPseudorandomString(@NotNull String string) {
         List<Color> colorList = new ArrayList<>();
         double r = 1;
-        Random random = new Random(string.hashCode() / 2 + RebarWorldEdit.getInstance().getServer().getName().hashCode() / 2);
+        Random random = new Random(string.hashCode() / 2 + RebarWorldedit.getInstance().getServer().getName().hashCode() / 2);
         while (1 / r >= random.nextDouble() && r * r <= string.length()) {
             int red = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);
             int green = (int) ((random.nextDouble() * 8 + 8) * 15 + random.nextDouble() * 12 + 4);

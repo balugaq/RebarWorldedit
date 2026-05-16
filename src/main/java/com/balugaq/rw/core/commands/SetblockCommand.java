@@ -3,54 +3,44 @@ package com.balugaq.rw.core.commands;
 import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.api.RWBlockBreakContext;
 import com.balugaq.rw.api.RWBlockCreateContext;
-import com.balugaq.rw.implementation.RebarWorldedit;
-import com.balugaq.rw.utils.CommandUtil;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
-import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.pylonmc.rebar.block.BlockStorage;
 import io.github.pylonmc.rebar.block.RebarBlockSchema;
-import io.github.pylonmc.rebar.command.RebarCommandKt;
 import io.github.pylonmc.rebar.command.RegistryCommandArgument;
 import io.github.pylonmc.rebar.item.RebarItem;
 import io.github.pylonmc.rebar.registry.RebarRegistry;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.math.BlockPosition;
+import io.papermc.paper.math.FinePosition;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
-public class PasteCommand {
-    public static final String KEY = "paste";
+public class SetblockCommand {
+    public static final String KEY = "setblock";
     @NotNull
     private final IRebarWorldedit plugin;
 
-    public PasteCommand(@NotNull IRebarWorldedit plugin) {
+    public SetblockCommand(@NotNull IRebarWorldedit plugin) {
         this.plugin = plugin;
     }
 
-
-    public void execute(CommandContext<CommandSourceStack> ctx, @Nullable RebarBlockSchema schema, boolean override, boolean withoutblock) {
+    public void execute(CommandContext<CommandSourceStack> ctx, @Nullable BlockPosition bpos, @Nullable RebarBlockSchema schema, boolean withoutblock) {
         Player player = (Player) ctx.getSource().getSender();
 
         NamespacedKey blockId;
@@ -67,91 +57,89 @@ public class PasteCommand {
             blockId = schema.getKey();
         }
 
-        final Location pos1 = plugin.getCommandManager().getPos1(player.getUniqueId());
-        final Location pos2 = plugin.getCommandManager().getPos2(player.getUniqueId());
+        final Location pos;
 
-        if (pos1 == null || pos2 == null) {
+        if (bpos == null) {
+            if (plugin.getCommandManager().getPos1(player.getUniqueId()) != null) {
+                pos = plugin.getCommandManager().getPos1(player.getUniqueId()).toLocation(player.getWorld());
+            }
+            else if (plugin.getCommandManager().getPos2(player.getUniqueId()) != null) {
+                pos = plugin.getCommandManager().getPos1(player.getUniqueId()).toLocation(player.getWorld());
+            } else {
+                pos = null;
+            }
+        } else {
+            pos = bpos.toLocation(player.getWorld());
+        }
+
+        if (pos == null) {
             plugin.send(player, "error.no-selection");
             return;
         }
 
-        if (!Objects.equals(pos1.getWorld().getUID(), pos2.getWorld().getUID())) {
-            plugin.send(player, "error.world-mismatch");
-            return;
-        }
-
-        final long range = WorldUtils.getRange(pos1, pos2);
-        final long max = plugin.getConfigManager().getModificationBlockLimit();
-        if (range > max) {
-            plugin.send(player, "error.too-many-blocks", range, max);
-            return;
-        }
-
-        plugin.send(player, "command.paste.start", "pos1", WorldUtils.locationToString(pos1), "pos2", WorldUtils.locationToString(pos2));
+        plugin.send(player, "command.setblock.start", "block", WorldUtils.locationToString(pos));
 
         final long currentMillSeconds = System.currentTimeMillis();
 
         final AtomicInteger count = new AtomicInteger();
 
-        WorldUtils.doWorldEdit(player, pos1, pos2, (location -> {
+        WorldUtils.doWorldEdit(player, pos, pos, (location -> {
             final Block targetBlock = location.getBlock();
-            if (override) {
-                BlockStorage.breakBlock(location, RWBlockBreakContext.create(location));
-            }
             if (BlockStorage.get(location) == null) {
                 BlockStorage.placeBlock(location, blockId, RWBlockCreateContext.create(targetBlock, !withoutblock));
                 count.addAndGet(1);
             }
         }), () -> {
-            plugin.send(player, "command.paste.success", "blocks", count.get(), "block", RebarRegistry.BLOCKS.get(blockId).getNameTranslationKey(), "time", System.currentTimeMillis() - currentMillSeconds);
+            plugin.send(player, "command.setblock.success", "block", RebarRegistry.BLOCKS.get(blockId).getNameTranslationKey(), "time", System.currentTimeMillis() - currentMillSeconds);
         });
     }
-
     
     @NotNull
     public String getKey() {
         return KEY;
     }
 
-
     public @NotNull LiteralArgumentBuilder<CommandSourceStack> get() {
         return Commands.literal(getKey())
                 .requires(source -> PermissionUtil.hasPermission(source.getSender(), getKey()) && source.getSender() instanceof Player)
                 .executes(ctx -> {
-                    execute(ctx, null, false, false);
+                    execute(ctx, null, null, false);
                     return SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("blockId", new RegistryCommandArgument<>(RebarRegistry.BLOCKS))
                     .executes(ctx -> {
                         execute(
-                              ctx, ctx.getArgument("blockId", RebarBlockSchema.class), false, false
+                              ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), false
                         );
                         return SINGLE_SUCCESS;
                     })
-                        .then(Commands.argument("override", BoolArgumentType.bool()))
+                        .then(Commands.argument("withoutblock", BoolArgumentType.bool()))
                         .executes(ctx -> {
                             execute(
-                                  ctx, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "override"), false
+                                  ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "withoutblock")
                             );
                             return SINGLE_SUCCESS;
-                        })
-                            .then(Commands.argument("withoutblock", BoolArgumentType.bool())
-                            .executes(ctx -> {
-                                execute(
-                                    ctx, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "override"), BoolArgumentType.getBool(ctx, "withoutblock")
-                                );
-                                return SINGLE_SUCCESS;
-                            })))
-                .then(Commands.argument("override", BoolArgumentType.bool())
+                        }))
+                .then(Commands.argument("pos", ArgumentTypes.blockPosition())
                       .executes(ctx -> {
-                          execute(ctx, null, BoolArgumentType.getBool(ctx, "override"), false);
+                          execute(
+                                ctx, ctx.getArgument("pos", BlockPosition.class), null, false
+                          );
                           return SINGLE_SUCCESS;
                       })
-                      .then(Commands.argument("withoutblock", BoolArgumentType.bool())
-                          .executes(ctx -> {
-                              execute(ctx, null, BoolArgumentType.getBool(ctx, "override"), BoolArgumentType.getBool(ctx, "withoutblock"));
-                              return SINGLE_SUCCESS;
-                          })
-                      ));
+                      .then(Commands.argument("blockId", new RegistryCommandArgument<>(RebarRegistry.BLOCKS))
+                            .executes(ctx -> {
+                                execute(
+                                        ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), false
+                                );
+                                return SINGLE_SUCCESS;
+                            })
+                            .then(Commands.argument("withoutblock", BoolArgumentType.bool()))
+                            .executes(ctx -> {
+                                execute(
+                                        ctx, null, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "withoutblock")
+                                );
+                                return SINGLE_SUCCESS;
+                            })));
     }
 }

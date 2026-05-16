@@ -1,59 +1,53 @@
 package com.balugaq.rw.core.commands;
 
-import com.balugaq.rw.api.IRebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Location;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 
-public class SetPos2Command extends SubCommand {
-    private static final String KEY = "pos2";
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+
+public class SetPos2Command {
+    public static final String KEY = "pos2";
     @NotNull
-    private final IRebarWorldEdit plugin;
+    private final IRebarWorldedit plugin;
 
-    public SetPos2Command(@NotNull IRebarWorldEdit plugin) {
+    public SetPos2Command(@NotNull IRebarWorldedit plugin) {
         this.plugin = plugin;
     }
 
-    @Override
+
     @ParametersAreNonnullByDefault
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!PermissionUtil.hasPermission(commandSender, this)) {
-            plugin.send(commandSender, "error.no-permission");
-            return false;
-        }
-
-        if (!(commandSender instanceof Player player)) {
-            plugin.send(commandSender, "error.player-only");
-            return false;
-        }
-
+    public void execute(CommandContext<CommandSourceStack> ctx) {
+        Player player = (Player) ctx.getSource().getSender();
         plugin.getCommandManager().setPos2(player.getUniqueId(), player.getLocation().getBlock().getLocation());
         final Location pos1 = plugin.getCommandManager().getPos1(player.getUniqueId());
         final Location pos2 = plugin.getCommandManager().getPos2(player.getUniqueId());
-        if (pos1 != null) {
-            plugin.send(player, "command.setpos2.success-with-range", WorldUtils.locationToString(pos2), WorldUtils.locationRange(pos1, pos2));
+        if (pos2 != null) {
+            plugin.send(player, "command.setpos2.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
         } else {
-            plugin.send(player, "command.setpos2.success", WorldUtils.locationToString(pos2));
+            plugin.send(player, "command.setpos2.success", "pos", WorldUtils.locationToString(pos1));
         }
-        return true;
     }
 
-    @Override
-    @NotNull
-    @ParametersAreNonnullByDefault
-    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return new ArrayList<>();
-    }
 
-    @Override
+    public @NotNull LiteralArgumentBuilder<CommandSourceStack> get() {
+        return Commands.literal(getKey())
+                .requires(source -> PermissionUtil.hasPermission(source.getSender(), getKey()) && source.getSender() instanceof Player)
+                .executes(ctx -> {
+                    execute(ctx);
+                    return SINGLE_SUCCESS;
+                });
+    }
+    
     @NotNull
     public String getKey() {
         return KEY;

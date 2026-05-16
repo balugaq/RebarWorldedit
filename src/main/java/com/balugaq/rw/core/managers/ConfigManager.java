@@ -1,11 +1,10 @@
 package com.balugaq.rw.core.managers;
 
-import com.balugaq.rw.api.IRebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
@@ -17,9 +16,9 @@ import java.io.Reader;
 public class ConfigManager implements IManager {
     public static final long DEFAULT_MODIFICATION_BLOCK_LIMIT = 32768;
     @NotNull
-    private final IRebarWorldEdit plugin;
+    private final IRebarWorldedit plugin;
 
-    public ConfigManager(@NotNull IRebarWorldEdit plugin) {
+    public ConfigManager(@NotNull IRebarWorldedit plugin) {
         this.plugin = plugin;
     }
 
@@ -74,23 +73,6 @@ public class ConfigManager implements IManager {
 
     public int getModificationChunkPerSecond() {
         return plugin.getConfig().getInt("worldedit.modification-chunk-limit-per-second", 16);
-    }
-
-    public int getMaxBackups() {
-        return plugin.getConfig().getInt("worldedit.max-backups", 20);
-    }
-
-    public boolean isAllowUndo() {
-        return plugin.getConfig().getBoolean("worldedit.allow-undo", false);
-    }
-
-    @Nullable
-    public String getLanguage() {
-        return plugin.getConfig().getString("language", "zh-CN");
-    }
-
-    public void saveAll() {
-        plugin.getLogger().info(plugin.getLocalizationService().getString("messages.save-all"));
     }
 
     @Override

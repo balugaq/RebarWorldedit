@@ -23,30 +23,33 @@ public class RebarWorldeditor extends RebarItem implements RebarBlockInteractor 
     public void onUsedToClickBlock(@NotNull final PlayerInteractEvent event, @NotNull final EventPriority priority) {
         final Player player = event.getPlayer();
         if (!player.isOp() && !player.hasPermission(Constants.PERMISSION_ADMIN)) {
-            RebarWorldEdit.getInstance().send(player, "error.no-permission");
+            RebarWorldedit.getInstance().send(player, "error.no-permission");
             return;
         }
 
         Block block = event.getClickedBlock();
         if (event.getAction().isLeftClick()) {
-            RebarWorldEdit.getInstance().getCommandManager().setPos1(player.getUniqueId(), block.getLocation());
-            final Location pos1 = RebarWorldEdit.getInstance().getCommandManager().getPos1(player.getUniqueId());
-            final Location pos2 = RebarWorldEdit.getInstance().getCommandManager().getPos2(player.getUniqueId());
+            RebarWorldedit.getInstance().getCommandManager().setPos1(player.getUniqueId(), block.getLocation());
+            final Location pos1 = RebarWorldedit.getInstance().getCommandManager().getPos1(player.getUniqueId());
+            final Location pos2 = RebarWorldedit.getInstance().getCommandManager().getPos2(player.getUniqueId());
             if (pos2 != null) {
-                RebarWorldEdit.getInstance().send(player, "command.setpos1.success-with-range", WorldUtils.locationToString(pos1), WorldUtils.locationRange(pos1, pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos1.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
             } else {
-                RebarWorldEdit.getInstance().send(player, "command.setpos1.success", WorldUtils.locationToString(pos1));
+                RebarWorldedit.getInstance().send(player, "command.setpos1.success", "pos", WorldUtils.locationToString(pos1));
             }
         }
 
         if (event.getAction().isRightClick()) {
-            final Location pos1 = RebarWorldEdit.getInstance().getCommandManager().getPos1(player.getUniqueId());
-            final Location pos2 = RebarWorldEdit.getInstance().getCommandManager().getPos2(player.getUniqueId());
+            RebarWorldedit.getInstance().getCommandManager().setPos2(player.getUniqueId(), block.getLocation());
+            final Location pos1 = RebarWorldedit.getInstance().getCommandManager().getPos1(player.getUniqueId());
+            final Location pos2 = RebarWorldedit.getInstance().getCommandManager().getPos2(player.getUniqueId());
             if (pos1 != null) {
-                RebarWorldEdit.getInstance().send(player, "command.setpos2.success-with-range", WorldUtils.locationToString(pos1), WorldUtils.locationRange(pos1, pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos2.success-with-range", "pos", WorldUtils.locationToString(pos1), "range", WorldUtils.locationRange(pos1, pos2));
             } else {
-                RebarWorldEdit.getInstance().send(player, "command.setpos2.success", WorldUtils.locationToString(pos2));
+                RebarWorldedit.getInstance().send(player, "command.setpos2.success", "pos", WorldUtils.locationToString(pos2));
             }
         }
+
+        event.setCancelled(true);
     }
 }

@@ -1,13 +1,12 @@
 package com.balugaq.rw.implementation;
 
-import com.balugaq.rw.api.IRebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.core.managers.CommandManager;
 import com.balugaq.rw.core.managers.ConfigManager;
-import com.balugaq.rw.core.managers.DisplayManager;
-import com.balugaq.rw.utils.Debug;
 import com.balugaq.rw.utils.MinecraftVersion;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -21,10 +20,10 @@ import java.util.Set;
 
 @SuppressWarnings("unused")
 @Getter
-public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Listener {
+public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Listener {
     private static final MinecraftVersion RECOMMENDED_MC_VERSION = MinecraftVersion.V1_21_11;
     @Nullable
-    private static RebarWorldEdit instance;
+    private static RebarWorldedit instance;
     @NotNull
     private final String username;
     @NotNull
@@ -33,11 +32,10 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
     private final String branch;
     private CommandManager commandManager;
     private ConfigManager configManager;
-    private DisplayManager displayManager;
     private MinecraftVersion minecraftVersion;
 
 
-    public RebarWorldEdit() {
+    public RebarWorldedit() {
         this.username = "balugaq";
         this.repo = "RebarWorldedit";
         this.branch = "master";
@@ -49,9 +47,9 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
     }
 
     @NotNull
-    public static RebarWorldEdit getInstance() {
+    public static RebarWorldedit getInstance() {
         Preconditions.checkArgument(instance != null, "RebarWorldedit has not been enabled yet！");
-        return RebarWorldEdit.instance;
+        return RebarWorldedit.instance;
     }
 
     @Override
@@ -70,6 +68,7 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
     public void onEnable() {
         Preconditions.checkArgument(instance == null, "RebarWorldedit already has been enabled！");
         instance = this;
+        registerWithRebar();
 
         info("startup.load-config-manager");
         saveDefaultConfig();
@@ -98,10 +97,6 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
         if (!commandManager.registerCommands()) {
             warning("startup.register-commands-failed");
         }
-        
-        info("startup.loading-display-manager");
-        this.displayManager = new DisplayManager(this);
-        this.displayManager.onLoad();
 
         info("startup.done");
     }
@@ -109,11 +104,6 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
     @Override
     public void onDisable() {
         Preconditions.checkArgument(instance != null, "RebarWorldedit has not been enabled yet！");
-
-        if (this.displayManager != null) {
-            this.displayManager.onUnload();
-        }
-        this.displayManager = null;
 
         if (this.commandManager != null) {
             this.commandManager.onUnload();
@@ -139,10 +129,10 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
             }
         } catch (NoClassDefFoundError | NullPointerException e) {
             warning("startup.auto-update-failed");
-            e.printStackTrace();
+            trace(e);
         } catch (UnsupportedOperationException e) {
             warning("startup.unsupported-guizhanlib-version");
-            Debug.trace(e);
+            trace(e);
         }
     }
 
@@ -150,12 +140,6 @@ public class RebarWorldEdit extends JavaPlugin implements IRebarWorldEdit, Liste
     @Override
     public JavaPlugin getJavaPlugin() {
         return this;
-    }
-
-    public void debug(@NotNull String message) {
-        if (getConfigManager().isDebug()) {
-            Debug.warning("[DEBUG] " + message);
-        }
     }
 
     @NotNull

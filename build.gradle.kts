@@ -19,9 +19,6 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/") {
         name = "papermc"
     }
-    maven("https://repo.metamechanists.org/releases") {
-        name = "MetaMechanists Repository"
-    }
     maven("https://jitpack.io") {
         name = "JitPack"
     }
@@ -37,8 +34,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
     compileOnly("io.github.pylonmc:rebar:$rebarVersion")
     compileOnly("io.github.pylonmc:pylon:$pylonVersion")
-    implementation("org.metamechanists:DisplayModelLib:35")
-    shadow("org.metamechanists:DisplayModelLib:35")
 }
 
 // Settings for IntelliJ
@@ -56,8 +51,6 @@ java {
 
 // Configuration for the output JAR
 tasks.shadowJar {
-    relocate("org.metamechanists", "${project.group}.shaded.org.metamechanists")
-
     mergeServiceFiles()
 
     archiveBaseName = project.name
@@ -73,6 +66,19 @@ bukkit {
     depend = listOf("Rebar")
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     website = "https://github.com/balugaq/RebarWorldedit"
+    commands {
+        register("clear")
+        register("clearpos")
+        register("clone")
+        register("confirm")
+        register("help")
+        register("paste")
+        register("setpos1")
+        register("setpos2")
+        register("rule")
+        register("version")
+        register("reload")
+    }
 }
 
 // Run a server using the run server gradle plugin
@@ -82,7 +88,7 @@ tasks.runServer {
         github("pylonmc", "rebar", rebarVersion, "rebar-$rebarVersion.jar")
     }
     maxHeapSize = "4G"
-    minecraftVersion("1.21.10")
+    minecraftVersion("1.21.11")
 }
 
 tasks.build {

@@ -1,10 +1,18 @@
 package com.balugaq.rw.core.commands;
 
-import com.balugaq.rw.api.IRebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.utils.PermissionUtil;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -12,79 +20,50 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RuleCommand extends SubCommand {
-    private static final Map<String, String> RULES = new HashMap<>();
-    private static final String KEY = "rule";
+import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
-    static {
-        RULES.put("limitBlocks", "worldedit.modification-block-limit");
-        RULES.put("limitChunkPerSecond", "worldedit.modification-chunk-limit-per-second");
-    }
+public class RuleCommand {
+    public static final String KEY = "rule";
 
     @NotNull
-    private final IRebarWorldEdit plugin;
+    private final IRebarWorldedit plugin;
 
-    public RuleCommand(@NotNull IRebarWorldEdit plugin) {
+    public RuleCommand(@NotNull IRebarWorldedit plugin) {
         this.plugin = plugin;
     }
 
-    @Override
+    
     @ParametersAreNonnullByDefault
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!PermissionUtil.hasPermission(commandSender, this)) {
-            plugin.send(commandSender, "error.no-permission");
-            return false;
-        }
-
-        if (args.length < 1) {
-            plugin.send(commandSender, "error.missing-argument", "rule");
-            return false;
-        }
-
-        if (args.length < 2) {
-            plugin.send(commandSender, "error.missing-argument", "value");
-            return false;
-        }
-
-        String ruleName = args[0];
-        if (!RULES.containsKey(ruleName)) {
-            plugin.send(commandSender, "error.invalid-rule");
-            return false;
-        }
-
-        String ruleKey = RULES.get(ruleName);
-        String value = args[1];
-
-        int intValue;
-        try {
-            intValue = Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            plugin.send(commandSender, "error.invalid-argument", value);
-            return false;
-        }
-
-        plugin.getConfigManager().setConfig(ruleKey, intValue);
-        plugin.send(commandSender, "command.rule.success", ruleName, intValue);
-
-        return true;
+    public void execute(CommandContext<CommandSourceStack> ctx, String rule, Object value) {
+        plugin.getConfigManager().setConfig(rule, value);
+        plugin.send(ctx.getSource().getSender(), "command.rule.success", "rule", rule, "value", value);
     }
 
-    @Override
-    @NotNull
-    @ParametersAreNonnullByDefault
-    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!PermissionUtil.hasPermission(commandSender, this)) {
-            return new ArrayList<>();
-        }
+    public @NotNull LiteralArgumentBuilder<CommandSourceStack> get() {
+        return Commands.literal(getKey())
+                .requires(source -> PermissionUtil.hasPermission(source.getSender(), getKey()))
+                .then(Commands.argument("rule", StringArgumentType.word())
+                              .suggests((ctx, builder) ->
+                                  builder.suggest("worldedit.modification-block-limit").buildFuture()
+                              )
+                              .then(Commands.argument("value", IntegerArgumentType.integer(0)))
+                              .executes(ctx -> {
+                                  execute(ctx, "worldedit.modification-block-limit", IntegerArgumentType.getInteger(ctx, "value"));
+                                  return SINGLE_SUCCESS;
+                              }))
+                .then(Commands.argument("rule", StringArgumentType.word())
+                              .suggests((ctx, builder) ->
+                                  builder.suggest("worldedit.modification-chunk-limit-per-second").buildFuture()
+                              )
+                              .then(Commands.argument("value", IntegerArgumentType.integer(0)))
+                              .executes(ctx -> {
+                                  execute(ctx, "worldedit.modification-chunk-limit-per-second", IntegerArgumentType.getInteger(ctx, "value"));
+                                  return SINGLE_SUCCESS;
+                              }));
 
-        if (args.length <= 1) {
-            return new ArrayList<>(RULES.keySet());
-        }
-
-        return new ArrayList<>();
     }
 
-    @Override
+    
     @NotNull
     public String getKey() {
         return KEY;

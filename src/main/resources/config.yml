@@ -4,7 +4,5 @@ auto-update: true
 worldedit:
   modification-block-limit: 32768
   modification-chunk-limit-per-second: 16
-  allow-undo: true
-  max-backups: 20
 
 debug: false

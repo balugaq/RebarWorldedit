@@ -1,12 +1,9 @@
 package com.balugaq.rw.utils;
 
-import com.balugaq.rw.api.BukkitContent;
 import com.balugaq.rw.api.ChunkData;
-import com.balugaq.rw.api.Content;
 import com.balugaq.rw.api.Facing;
-import com.balugaq.rw.api.IRebarWorldEdit;
-import com.balugaq.rw.api.RebarContent;
-import com.balugaq.rw.implementation.RebarWorldEdit;
+import com.balugaq.rw.api.IRebarWorldedit;
+import com.balugaq.rw.implementation.RebarWorldedit;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.pylonmc.rebar.block.BlockStorage;
 import org.bukkit.Bukkit;
@@ -19,11 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -33,8 +28,7 @@ import java.util.function.Consumer;
  * @author balugaq
  */
 public class WorldUtils {
-    public static final IRebarWorldEdit plugin = RebarWorldEdit.getInstance();
-    public static final boolean ALLOW_UNDO = plugin.getConfigManager().isAllowUndo();
+    public static final IRebarWorldedit plugin = RebarWorldedit.getInstance();
     @Nullable
     protected static Class<?> craftBlockStateClass;
     @Nullable
@@ -92,12 +86,6 @@ public class WorldUtils {
 
     @NotNull
     public static String locationToString(@NotNull Location l) {
-        if (l == null) {
-            return plugin.translate("error.unknown-location");
-        }
-        if (l.getWorld() == null) {
-            return plugin.translate("error.unknown-world");
-        }
         return l.getWorld().getName() + "," + l.getBlockX() + "," + l.getBlockY() + "," + l.getBlockZ();
     }
 
@@ -113,6 +101,10 @@ public class WorldUtils {
         final int downZ = Math.min(pos1.getBlockZ(), pos2.getBlockZ());
         final int upZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
         return (long) (Math.abs(upX - downX) + 1) * (Math.abs(upY - downY) + 1) * (Math.abs(upZ - downZ) + 1);
+    }
+
+    public static void doWorldEdit(@Nullable Player player, @NotNull Location pos1, @NotNull Location pos2, @NotNull Consumer<Location> consumer) {
+        doWorldEdit(player, pos1, pos2, consumer, null);
     }
 
     public static void doWorldEdit(@Nullable Player player, @NotNull Location pos1, @NotNull Location pos2, @NotNull Consumer<Location> consumer, @Nullable Runnable ending) {
@@ -145,25 +137,17 @@ public class WorldUtils {
             }
         }
 
-        List<Content> backup = new ArrayList<>();
         final Iterator<ChunkData> iterator = chunks.keySet().iterator();
-        final int chunkLimitPerSecond = RebarWorldEdit.getInstance().getConfigManager().getModificationChunkPerSecond();
+        final int chunkLimitPerSecond = RebarWorldedit.getInstance().getConfigManager().getModificationChunkPerSecond();
         for (int i = 0; i < chunks.size() && iterator.hasNext(); i += chunkLimitPerSecond) {
             plugin.debug("WorldEdit: processing chunk " + i + "/" + chunks.size());
             Bukkit.getScheduler().runTaskLater(
-                    RebarWorldEdit.getInstance(), () -> {
+                    RebarWorldedit.getInstance(), () -> {
                 plugin.debug("WorldEdit: processing task...");
                 for (int j = 0; j < chunkLimitPerSecond && iterator.hasNext(); j++) {
                     final ChunkData chunkData = iterator.next();
                     final Set<Location> locations = chunks.get(chunkData);
                     for (Location location : locations) {
-                        if (ALLOW_UNDO && player != null) {
-                            if (isRebarBlock(location)) {
-                                backup.add(getRebarContent(location));
-                            } else {
-                                backup.add(getBukkitContent(location));
-                            }
-                        }
                         consumer.accept(location);
                     }
                 }
@@ -172,11 +156,7 @@ public class WorldUtils {
 
         if (player != null) {
             Bukkit.getScheduler().runTaskLater(
-                    RebarWorldEdit.getInstance(), () -> {
-                if (ALLOW_UNDO) {
-                    plugin.debug("WorldEdit: saving backup...");
-                    RebarWorldEdit.getInstance().getCommandManager().addBackup(player.getUniqueId(), backup);
-                }
+                    RebarWorldedit.getInstance(), () -> {
                 if (ending != null) {
                     ending.run();
                 }
@@ -214,13 +194,12 @@ public class WorldUtils {
             }
         }
 
-        List<Content> backup = new ArrayList<>();
         final Iterator<ChunkData> iterator = chunks.keySet().iterator();
-        final int chunkLimitPerSecond = RebarWorldEdit.getInstance().getConfigManager().getModificationChunkPerSecond();
+        final int chunkLimitPerSecond = RebarWorldedit.getInstance().getConfigManager().getModificationChunkPerSecond();
         for (int i = 0; i < chunks.size() && iterator.hasNext(); i += chunkLimitPerSecond) {
             plugin.debug("WorldEdit: processing chunk " + i + "/" + chunks.size());
             Bukkit.getScheduler().runTaskLater(
-                    RebarWorldEdit.getInstance(), () -> {
+                    RebarWorldedit.getInstance(), () -> {
                 plugin.debug("WorldEdit: processing task...");
                 for (int j = 0; j < chunkLimitPerSecond && iterator.hasNext(); j++) {
                     final ChunkData chunkData = iterator.next();
@@ -232,7 +211,7 @@ public class WorldUtils {
             }, 20L * i / chunkLimitPerSecond);
         }
 
-        Bukkit.getScheduler().runTaskLater(RebarWorldEdit.getInstance(), ending, 20L * chunks.size() / chunkLimitPerSecond);
+        Bukkit.getScheduler().runTaskLater(RebarWorldedit.getInstance(), ending, 20L * chunks.size() / chunkLimitPerSecond);
     }
 
     public static long getRange(@NotNull Location pos1, @NotNull Location pos2) {
@@ -250,16 +229,6 @@ public class WorldUtils {
 
     public static boolean isRebarBlock(@NotNull Location location) {
         return BlockStorage.get(location) != null;
-    }
-
-    @NotNull
-    public static BukkitContent getBukkitContent(@NotNull Location location) {
-        return new BukkitContent(location, location.getBlock().getState());
-    }
-
-    @NotNull
-    public static RebarContent getRebarContent(@NotNull Location location) {;
-        return new RebarContent(location, location.getBlock().getState(), BlockStorage.get(location).getSchema().getKey());
     }
 
     @NotNull
