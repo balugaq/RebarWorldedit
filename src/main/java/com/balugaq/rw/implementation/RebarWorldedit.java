@@ -157,11 +157,6 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
         return minecraftVersion.isAtLeast(RECOMMENDED_MC_VERSION);
     }
 
-    @NotNull
-    public NamespacedKey newKey(@NotNull String key) {
-        return new NamespacedKey(this, key);
-    }
-
     @Override
     public @NotNull Set<Locale> getLanguages() {
         return Set.of(
