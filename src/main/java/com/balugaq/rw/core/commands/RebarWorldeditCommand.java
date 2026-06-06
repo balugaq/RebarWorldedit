@@ -22,6 +22,7 @@ public class RebarWorldeditCommand {
     private final SetPos1Command setPosCommand = new SetPos1Command(instance);
     private final SetPos2Command setPos2Command = new SetPos2Command(instance);
     private final VersionCommand versionCommand = new VersionCommand(instance);
+    private final SetblockCommand setblockCommand = new SetblockCommand(instance);
 
     public final LiteralCommandNode<CommandSourceStack> ROOT = Commands.literal("rebarworldedit")
             .then(clearCommand.get())
@@ -34,6 +35,7 @@ public class RebarWorldeditCommand {
             .then(setPosCommand.get())
             .then(setPos2Command.get())
             .then(versionCommand.get())
+            .then(setblockCommand.get())
             .build();
 
     public final LiteralCommandNode<CommandSourceStack> ROOT_ALIAS = Commands.literal("rw")
