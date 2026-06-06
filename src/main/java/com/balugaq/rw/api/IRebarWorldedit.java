@@ -41,7 +41,7 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
 
     default Component arguments(@Nullable Locale locale, @NotNull String translationKey, @Nullable Object @NotNull ... args) {
         List<RebarArgument> pargs = new ArrayList<>();
-        for (int i = 0; i < args.length / 2; i += 1) {
+        for (int i = 0; i < args.length; i += 2) {
             if (args[i] == null || args[i + 1] == null) {
                 continue;
             }

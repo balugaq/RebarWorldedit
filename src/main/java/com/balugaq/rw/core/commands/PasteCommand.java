@@ -75,7 +75,7 @@ public class PasteCommand {
             return;
         }
 
-        plugin.send(player, "command.paste.start", "pos1", WorldUtils.fineLocStr(pos1), "pos2", WorldUtils.fineLocStr(pos2));
+        plugin.send(player, "command.paste.start", "pos1", WorldUtils.fineLocStr(pos1), "pos2", WorldUtils.fineLocStr(pos2), "block", RebarRegistry.BLOCKS.get(blockId).getNameTranslationKey());
 
         final long currentMillSeconds = System.currentTimeMillis();
 
@@ -110,25 +110,25 @@ public class PasteCommand {
                     return SINGLE_SUCCESS;
                 })
                 .then(Commands.argument("blockId", new RegistryCommandArgument<>(RebarRegistry.BLOCKS))
+                    .executes(ctx -> {
+                        execute(
+                                ctx, ctx.getArgument("blockId", RebarBlockSchema.class), false, false
+                        );
+                        return SINGLE_SUCCESS;
+                    })
                     .then(Commands.argument("override", BoolArgumentType.bool())
-                        .then(Commands.argument("withoutblock", BoolArgumentType.bool())
-                            .executes(ctx -> {
-                                execute(
-                                    ctx, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "override"), BoolArgumentType.getBool(ctx, "withoutblock")
-                                );
-                                return SINGLE_SUCCESS;
-                             }))))
                         .executes(ctx -> {
                             execute(
                                     ctx, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "override"), false
                             );
                             return SINGLE_SUCCESS;
                         })
-                    .executes(ctx -> {
-                        execute(
-                              ctx, ctx.getArgument("blockId", RebarBlockSchema.class), false, false
-                        );
-                        return SINGLE_SUCCESS;
-                    });
+                        .then(Commands.argument("withoutblock", BoolArgumentType.bool())
+                            .executes(ctx -> {
+                                execute(
+                                    ctx, ctx.getArgument("blockId", RebarBlockSchema.class), BoolArgumentType.getBool(ctx, "override"), BoolArgumentType.getBool(ctx, "withoutblock")
+                                );
+                                return SINGLE_SUCCESS;
+                             }))));
     }
 }
