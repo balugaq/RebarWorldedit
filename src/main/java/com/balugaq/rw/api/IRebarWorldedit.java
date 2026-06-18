@@ -123,4 +123,8 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
     default @Nullable Component get(@NotNull String key) {
         return arguments(null, key);
     }
+
+    default Locale getDefaultLanguage() {
+        return Locale.of("en");
+    }
 }
