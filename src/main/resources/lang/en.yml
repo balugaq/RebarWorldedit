@@ -1,25 +1,11 @@
 addon: "RebarWorldedit"
 
 messages:
-  startup:
-    incompatible: "Incompatible environment! The plugin has been disabled!"
-    trying-update: "Attempting to update automatically..."
-    loading-items: "Loading items..."
-    registering-commands: "Registering commands..."
-    register-commands-failed: "Failed to register commands!"
-    done: "Successfully enabled this addon"
-    unsupported-guizhanlib-version: "Unable to compatible with GuizhanLib, automatic update failed!"
-    auto-update-failed: "Automatic update failed!"
-    null-minecraft-version: "Unable to get Minecraft version!"
-    unknown-minecraft-version: "Unable to recognize Minecraft version! Use this plugin with caution!"
-  shutdown:
-    goodbye: "Successfully disabled this addon"
   command:
     help:
       content:
         - "<green>======= SFWorldedit Command List =======&r"
         - "<aqua>/rw help (subcommand) <gray>- <yellow>Display help information"
-        - "<aqua>/rw reload <gray>- <yellow>Reload configuration file"
         - "<aqua>/rw version <gray>- <yellow>Display plugin version"
         - "<aqua>/rw pos1 <gray>- <yellow>Set the first position"
         - "<aqua>/rw pos2 <gray>- <yellow>Set the second position"
@@ -59,8 +45,6 @@ messages:
           - "<aqua>[skip-rebar]: <yellow>Skip Slimefun blocks"
         clearpos:
           - "<aqua>/rw clearpos <gray>- <yellow>Clear the position you have marked"
-        reload:
-          - "<aqua>/rw reload <gray>- <yellow>Reload configuration file"
         version:
           - "<aqua>/rw version <gray>- <yellow>Display plugin version"
         rule:
@@ -87,8 +71,6 @@ messages:
       success: "<green>Cleared <yellow>%blocks% <green>blocks. Time elapsed: <yellow>%time% <green>ms."
     clearpos:
       success: "<green>Cleared the position you have marked."
-    reload:
-      success: "<green>Configuration file has been reloaded."
     version:
       content: "<yellow>%name% <aqua>Plugin version: <yellow>%version%"
     rule:

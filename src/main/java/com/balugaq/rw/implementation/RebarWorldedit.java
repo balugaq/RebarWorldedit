@@ -6,10 +6,8 @@ import com.balugaq.rw.core.managers.ConfigManager;
 import com.balugaq.rw.utils.MinecraftVersion;
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +68,7 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
         instance = this;
         registerWithRebar();
 
-        info("startup.load-config-manager");
+        info("Loading config manager");
         saveDefaultConfig();
         this.configManager = new ConfigManager(this);
         this.configManager.onLoad();
@@ -79,26 +77,26 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
         boolean isCompatible = environmentCheck();
 
         if (!isCompatible) {
-            warning("startup.incompatible");
+            warning("Incompatible environment! The plugin has been disabled!");
             Bukkit.getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        info("startup.trying-update");
+        info("Attempting to update automatically...");
         tryUpdate();
 
-        info("startup.loading-items");
+        info("Loading items...");
         new RWSetup(this);
 
-        info("startup.registering-commands");
+        info("Registering commands...");
         this.commandManager = new CommandManager(this);
         this.commandManager.onLoad();
 
         if (!commandManager.registerCommands()) {
-            warning("startup.register-commands-failed");
+            warning("Failed to register commands!");
         }
 
-        info("startup.done");
+        info("Successfully enabled this addon");
     }
 
     @Override
@@ -110,7 +108,7 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
         }
         this.commandManager = null;
         
-        info("shutdown.goodbye");
+        info("Successfully disabled this addon");
 
         this.minecraftVersion = null;
 
@@ -128,10 +126,10 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
                 // TODO
             }
         } catch (NoClassDefFoundError | NullPointerException e) {
-            warning("startup.auto-update-failed");
+            warning("Automatic update failed!");
             trace(e);
         } catch (UnsupportedOperationException e) {
-            warning("startup.unsupported-guizhanlib-version");
+            warning("Unable to compatible with GuizhanPluginLib, automatic update failed!");
             trace(e);
         }
     }
@@ -151,7 +149,7 @@ public class RebarWorldedit extends JavaPlugin implements IRebarWorldedit, Liste
         this.minecraftVersion = MinecraftVersion.current();
 
         if (minecraftVersion == MinecraftVersion.UNKNOWN) {
-            warning("startup.unknown-minecraft-version");
+            warning("Unable to recognize Minecraft version! Use this plugin with caution!");
         }
 
         return minecraftVersion.isAtLeast(RECOMMENDED_MC_VERSION);

@@ -82,25 +82,21 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
         player.sendMessage(arguments(player.locale(), MESSAGE_PREFIX + translationKey, args));
     }
 
-    default @NotNull Component translate(@NotNull String key) {
-        return GlobalTranslator.render(Component.translatable(MESSAGE_PREFIX + key), Locale.of("en"));
+    default void info(@NotNull String text) {
+        log(0xFFFFFF , "[RebarWorldedit] [INFO] ", text);
     }
 
-    default void info(@NotNull String key) {
-        log(0xFFFFFF , "[RebarWorldedit] [INFO] ", key);
+    default void warning(@NotNull String text) {
+        log(0xFFFF55, "[RebarWorldedit] [WARNING] ", text);
     }
 
-    default void warning(@NotNull String key) {
-        log(0xFFFF55, "[RebarWorldedit] [WARNING] ", key);
-    }
-
-    default void severe(@NotNull String key) {
-        log(0xFF5555, "[RebarWorldedit] [SEVERE] ", key);
+    default void severe(@NotNull String text) {
+        log(0xFF5555, "[RebarWorldedit] [SEVERE] ", text);
     }
 
     default void debug(@NotNull String message) {
         if (getConfigManager().isDebug()) {
-            logDebug(0x55FFFF, "[RebarWorldedit] [DEBUG] ", message);
+            log(0x55FFFF, "[RebarWorldedit] [DEBUG] ", message);
         }
     }
 
@@ -108,13 +104,10 @@ public interface IRebarWorldedit extends RebarAddon, Plugin {
         e.printStackTrace();
     }
 
-    default void log(int color, @NotNull String prefix, @NotNull String key) {
-        Bukkit.getConsoleSender().sendMessage(Component.text().color(TextColor.color(color)).append(Component.text(prefix).append(translate(key))));
+    default void log(int color, @NotNull String prefix, @NotNull String text) {
+        Bukkit.getConsoleSender().sendMessage(Component.text().color(TextColor.color(color)).append(Component.text(prefix).append(Component.text(text))));
     }
 
-    default void logDebug(int color, @NotNull String prefix, @NotNull String message) {
-        Bukkit.getConsoleSender().sendMessage(Component.text().color(TextColor.color(color)).append(Component.text(prefix).append(Component.text(message))));
-    }
 
     @Nullable
     default String getBugTrackerURL() {
