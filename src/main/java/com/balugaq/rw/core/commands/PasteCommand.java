@@ -87,7 +87,7 @@ public class PasteCommand {
                 BlockStorage.breakBlock(location, RWBlockBreakContext.create(location));
             }
             if (BlockStorage.get(location) == null) {
-                BlockStorage.placeBlock(location, blockId, RWBlockCreateContext.create(targetBlock, !withoutblock));
+                BlockStorage.placeBlock(location, blockId, RWBlockCreateContext.create(player, targetBlock, !withoutblock));
                 count.addAndGet(1);
             }
         }), () -> {

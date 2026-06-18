@@ -3,26 +3,29 @@ package com.balugaq.rw.api;
 import io.github.pylonmc.rebar.block.context.BlockCreateContext;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-public record RWBlockCreateContext(@NotNull Block block, boolean shouldSetType) implements BlockCreateContext {
-    public static RWBlockCreateContext create(@NotNull Block block, boolean shouldSetType) {
-        return new RWBlockCreateContext(block, shouldSetType);
+@NullMarked
+public record RWBlockCreateContext(@Nullable Player player, Block block, boolean shouldSetType) implements BlockCreateContext {
+    public static RWBlockCreateContext create(@Nullable Player player, Block block, boolean shouldSetType) {
+        return new RWBlockCreateContext(player, block, shouldSetType);
     }
-
-    public static RWBlockCreateContext create(@NotNull Block block) {
-        return new RWBlockCreateContext(block, true);
+    
+    @Override
+    public @Nullable Player getPlayer() {
+        return player;
     }
 
     @Override
-    public @NotNull BlockFace getFacing() {
+    public BlockFace getFacing() {
         return BlockFace.NORTH;
     }
 
     @Override
-    public @NotNull BlockFace getFacingVertical() {
+    public BlockFace getFacingVertical() {
         return BlockFace.NORTH;
     }
 
@@ -32,7 +35,7 @@ public record RWBlockCreateContext(@NotNull Block block, boolean shouldSetType) 
     }
 
     @Override
-    public @NotNull Block getBlock() {
+    public Block getBlock() {
         return block;
     }
 

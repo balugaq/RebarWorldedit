@@ -2,7 +2,7 @@ package com.balugaq.rw.core.commands;
 
 import com.balugaq.rw.api.IRebarWorldedit;
 import com.balugaq.rw.api.RWBlockBreakContext;
-import com.balugaq.rw.implementation.RebarWorldedit;
+import com.balugaq.rw.api.RWBlockCreateContext;
 import com.balugaq.rw.utils.PermissionUtil;
 import com.balugaq.rw.utils.WorldUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -10,12 +10,10 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import io.github.pylonmc.rebar.block.BlockStorage;
 import io.github.pylonmc.rebar.block.RebarBlock;
-import io.github.pylonmc.rebar.block.context.BlockCreateContext;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,11 +70,11 @@ public class CloneCommand {
             final Block toBlock = playerLocation.getWorld().getBlockAt(fromLocation.getBlockX() + dx, fromLocation.getBlockY() + dy, fromLocation.getBlockZ() + dz);
             final Location toLocation = toBlock.getLocation();
 
-            final RebarBlock rebarBlock = BlockStorage.get(fromLocation);
+            final RebarBlock fromRebarBlock = BlockStorage.get(fromLocation);
 
             // If vanilla block, just copy block state.
             // If Rebar block, should create Rebar Block first, then copy BlockState.
-            if (rebarBlock == null) {
+            if (fromRebarBlock == null) {
                 // Block Data
                 WorldUtils.copyBlockState(fromBlock.getState(), toBlock);
             }
@@ -85,17 +83,16 @@ public class CloneCommand {
             count.addAndGet(1);
 
             // Rebar Data
-            if (rebarBlock == null) {
+            if (fromRebarBlock == null) {
                 return;
             }
 
-            final RebarBlock fromRebarBlock = BlockStorage.get(fromLocation);
             if (override) {
                 BlockStorage.breakBlock(toLocation, RWBlockBreakContext.create(toLocation));
             }
 
             // Rebar Block
-            BlockStorage.placeBlock(toLocation, fromRebarBlock.getKey(), new BlockCreateContext.PluginGenerate(RebarWorldedit.getInstance(), BlockFace.NORTH, BlockFace.NORTH, toLocation.getBlock(), null));
+            BlockStorage.placeBlock(toLocation, fromRebarBlock.getKey(), RWBlockCreateContext.create(player, toBlock, false));
 
             // Copy BlockState after creating Rebar block
             WorldUtils.copyBlockState(fromBlock.getState(), toBlock);

@@ -4,7 +4,7 @@ import com.balugaq.rw.utils.Constants;
 import com.balugaq.rw.utils.WorldUtils;
 import io.github.pylonmc.rebar.event.api.annotation.MultiHandler;
 import io.github.pylonmc.rebar.item.RebarItem;
-import io.github.pylonmc.rebar.item.base.RebarBlockInteractor;
+import io.github.pylonmc.rebar.item.interfaces.BlockInteractRebarItemHandler;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -13,14 +13,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class RebarWorldeditor extends RebarItem implements RebarBlockInteractor {
+public class RebarWorldeditor extends RebarItem implements BlockInteractRebarItemHandler {
     public RebarWorldeditor(@NotNull final ItemStack stack) {
         super(stack);
     }
 
     @Override
     @MultiHandler(priorities = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onUsedToClickBlock(@NotNull final PlayerInteractEvent event, @NotNull final EventPriority priority) {
+    public void onInteractWithBlock(@NotNull final PlayerInteractEvent event, @NotNull final EventPriority priority) {
         final Player player = event.getPlayer();
         if (!player.isOp() && !player.hasPermission(Constants.PERMISSION_ADMIN)) {
             RebarWorldedit.getInstance().send(player, "error.no-permission");

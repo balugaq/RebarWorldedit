@@ -83,7 +83,7 @@ public class SetblockCommand {
         WorldUtils.doWorldEdit(player, pos, pos, (location -> {
             final Block targetBlock = location.getBlock();
             if (BlockStorage.get(location) == null) {
-                BlockStorage.placeBlock(location, blockId, RWBlockCreateContext.create(targetBlock, !withoutblock));
+                BlockStorage.placeBlock(location, blockId, RWBlockCreateContext.create(player, targetBlock, !withoutblock));
                 count.addAndGet(1);
             }
         }), () -> {
